@@ -31,7 +31,7 @@ export class PSCBoundClient {
 
 export default class PSC {
     static USE_MASTER_KEY = 'USE_MASTER_KEY';
-    static version = '0.0.1';
+    static version = '0.0.2';
 
     Master: PSCBoundClient;
     fetch: SimpleFetch;
