@@ -1,0 +1,28 @@
+{
+  "name": "psc",
+  "version": "0.0.1",
+  "description": "REST client for parse-server",
+  "main": "build/src/index.js",
+  "typings": "build/src/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "ospec ./build/tests/*.spec.js",
+    "prepublish": "tsc"
+  },
+  "keywords": [
+    "Parse.com",
+    "parse-server",
+    "REST",
+    "API"
+  ],
+  "author": "Blayne Chard <blayne@chard.nz>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:blacha/psc.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "2.x.x",
+    "ospec": "1.x.x"
+  }
+}

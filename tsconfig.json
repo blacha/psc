@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES5",
+        "outDir": "build/",
+        "sourceMap": true,
+        "declaration": true,
+        "lib": [
+            "es5",
+            "es2015.promise"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "build",
+        "lib"
+    ]
+}
