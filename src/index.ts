@@ -142,6 +142,7 @@ export class PSCQuery<T> {
     }
 
     first(): Promise<T> {
+        this.limit(1);
         return this.psc.runQuery(this).then(objects => objects[0]);
     }
 
