@@ -1,6 +1,6 @@
 {
   "name": "psc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "REST client for parse-server",
   "main": "build/src/index.js",
   "typings": "build/src/index.d.ts",
