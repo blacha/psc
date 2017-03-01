@@ -40,7 +40,7 @@ o.spec('PSC', () => {
 
                 var requestBody = JSON.parse(options.body);
                 o(requestBody._ApplicationId).equals(config.applicationId);
-                o(requestBody._SessionToken).equals(null);
+                o(requestBody._SessionToken).equals(undefined);
                 o(requestBody.username).equals('username');
                 o(requestBody.password).equals('password');
 

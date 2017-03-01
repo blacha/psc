@@ -29,6 +29,14 @@ export class PSCBoundClient {
     }
 }
 
+interface ParseRequestBody {
+    _SessionToken?: string;
+    _ApplicationId: string;
+    _method: string;
+}
+const HEADERS = {
+    'Content-Type': 'application/json'
+};
 export default class PSC {
     static USE_MASTER_KEY = 'USE_MASTER_KEY';
     static version = '0.0.2';
@@ -58,7 +66,7 @@ export default class PSC {
     runQuery<T>(query: PSCQuery<T>, sessionToken: SessionToken): Promise<T[]> {
         const url = `${this.config.url}/classes/${query.className}`;
 
-        return this.request('GET', url, query.toJSON(), sessionToken);
+        return this.request('GET', url, query.toJSON(), sessionToken).then(res => res.results)
     }
 
     run<T>(functionName: string, args: any, sessionToken: SessionToken) {
@@ -75,17 +83,20 @@ export default class PSC {
             }
         }
 
-        var requestBody = {
-            _SessionToken: sessionToken,
+        var requestBody: ParseRequestBody = {
             _ApplicationId: this.config.applicationId,
-            _PSCVersion: PSC.version,
             _method: method
         };
+
+        if (sessionToken != null) {
+            requestBody._SessionToken = sessionToken;
+        }
 
         Object.keys(data).forEach(k => requestBody[k] = data[k]);
 
         return this.fetch(url, {
             method: 'POST',
+            headers: HEADERS,
             body: JSON.stringify(requestBody)
         }).then(resp => {
             if (resp.status !== 200) {
