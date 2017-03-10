@@ -1,0 +1,28 @@
+{
+  "name": "psc-integration-tests",
+  "version": "0.0.3",
+  "description": "integration tests for psc",
+  "scripts": {
+    "build": "tsc",
+  },
+  "keywords": [
+    "Parse.com",
+    "parse-server",
+    "REST",
+    "API"
+  ],
+  "author": "Blayne Chard <blayne@chard.nz>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:blacha/psc.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "mongo-mock": "2.x.x",
+    "ospec": "1.x.x",
+    "parse-server": "2.x.x",
+    "typescript": "2.x.x",
+    "node-fetch": "^1.6.3"
+  },
+
+}
