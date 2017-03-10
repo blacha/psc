@@ -23,6 +23,9 @@ export class PSCBoundClient {
     run<T>(functionName: string, args: any): Promise<T> {
         return this.psc.run(functionName, args, this.sessionToken);
     }
+    save<T>(className: string, obj: T): Promise<T> {
+        return this.psc.save(className, obj, this.sessionToken);
+    }
 
     runQuery<T>(query: PSCQuery<T>): Promise<T[]> {
         return this.psc.runQuery(query, this.sessionToken);
@@ -79,6 +82,17 @@ export class PSC {
         return this.request('POST', url, args, sessionToken);
     }
 
+    save<T>(className: string, data: any, sessionToken: SessionToken) {
+        var url = `${this.config.url}/classes/${className}`
+        var method = 'POST';
+        if (data.objectId != null) {
+            url = `${url}/${data.objectId}`;
+            method = 'PUT';
+        }
+
+        return this.request(method, url, data, sessionToken);
+    }
+
     private request(method: string, url: string, data, sessionToken: SessionToken): Promise<any> {
         if (sessionToken === PSC.USE_MASTER_KEY) {
             sessionToken = this.config.masterKey;
@@ -103,7 +117,7 @@ export class PSC {
             headers: HEADERS,
             body: JSON.stringify(requestBody)
         }).then(resp => {
-            if (resp.status !== 200) {
+            if (resp.status > 299 || resp.status < 200) {
                 return Promise.reject(resp);
             }
             return resp.json();
