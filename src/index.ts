@@ -17,7 +17,7 @@ export class PSCBoundClient {
     }
 
     query<T>(className): PSCQuery<T> {
-        return PSCQuery.query<T>(this, className)
+        return PSCQuery.query<T>(this.psc, this.sessionToken, className)
     }
 
     run<T>(functionName: string, args: any): Promise<T> {
@@ -37,7 +37,7 @@ interface ParseRequestBody {
 const HEADERS = {
     'Content-Type': 'application/json'
 };
-export default class PSC {
+export class PSC {
     static USE_MASTER_KEY = 'USE_MASTER_KEY';
     static version = '0.0.3';
 
@@ -61,6 +61,10 @@ export default class PSC {
 
         return this.request('GET', url, { username: username.toLowerCase(), password }, null)
             .then(data => new PSCBoundClient(this, data.sessionToken));
+    }
+
+    query<T>(className: string, sessionToken: SessionToken): PSCQuery<T> {
+        return PSCQuery.query<T>(this, sessionToken, className)
     }
 
     runQuery<T>(query: PSCQuery<T>, sessionToken: SessionToken): Promise<T[]> {
@@ -109,17 +113,19 @@ export default class PSC {
 
 export class PSCQuery<T> {
     public className: string;
+    private sessionToken: SessionToken;
     private queryLimit: number = 1000;
     private where = {};
-    private psc: PSCBoundClient;
+    private psc: PSC;
 
-    constructor(psc: PSCBoundClient, className: string) {
+    constructor(psc: PSC, sessionToken: SessionToken, className: string) {
         this.className = className;
+        this.sessionToken = sessionToken;
         this.psc = psc;
     }
 
-    static query<T>(psc: PSCBoundClient, className: string): PSCQuery<T> {
-        return new PSCQuery(psc, className);
+    static query<T>(psc: PSC, sessionToken: SessionToken, className: string): PSCQuery<T> {
+        return new PSCQuery(psc, sessionToken, className);
     }
 
     limit(limit: number) {
@@ -138,12 +144,12 @@ export class PSCQuery<T> {
     }
 
     find(): Promise<T[]> {
-        return this.psc.runQuery(this);
+        return this.psc.runQuery(this, this.sessionToken);
     }
 
     first(): Promise<T> {
         this.limit(1);
-        return this.psc.runQuery(this).then(objects => objects[0]);
+        return this.psc.runQuery(this, this.sessionToken).then(objects => objects[0]);
     }
 
     toJSON() {
@@ -153,3 +159,5 @@ export class PSCQuery<T> {
         }
     }
 }
+
+export default PSC;
