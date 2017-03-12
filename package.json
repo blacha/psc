@@ -1,6 +1,6 @@
 {
   "name": "psc",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "REST client for parse-server",
   "main": "build/src/index.js",
   "typings": "build/src/index.d.ts",
@@ -22,7 +22,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "typescript": "2.x.x",
-    "ospec": "1.x.x"
+    "ospec": "1.x.x",
+    "typescript": "2.x.x"
   }
 }

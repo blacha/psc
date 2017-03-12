@@ -42,7 +42,7 @@ const HEADERS = {
 };
 export class PSC {
     static USE_MASTER_KEY = 'USE_MASTER_KEY';
-    static version = '0.0.3';
+    static version = '0.1.0';
 
     Master: PSCBoundClient;
     fetch: SimpleFetch;
