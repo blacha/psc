@@ -34,6 +34,7 @@ export class PSCBoundClient {
 
 interface ParseRequestBody {
     _SessionToken?: string;
+    _MasterKey?: string;
     _ApplicationId: string;
     _method: string;
 }
@@ -94,19 +95,20 @@ export class PSC {
     }
 
     private request(method: string, url: string, data, sessionToken: SessionToken): Promise<any> {
-        if (sessionToken === PSC.USE_MASTER_KEY) {
-            sessionToken = this.config.masterKey;
-            if (sessionToken == null) {
-                throw new Error('Unable to run masterKey request without masterKey');
-            }
-        }
+
 
         var requestBody: ParseRequestBody = {
             _ApplicationId: this.config.applicationId,
             _method: method
         };
 
-        if (sessionToken != null) {
+        if (sessionToken === PSC.USE_MASTER_KEY) {
+            if (this.config.masterKey == null) {
+                throw new Error('Unable to run masterKey request without masterKey');
+            }
+
+            requestBody._MasterKey = this.config.masterKey;
+        } else if (sessionToken != null) {
             requestBody._SessionToken = sessionToken;
         }
 

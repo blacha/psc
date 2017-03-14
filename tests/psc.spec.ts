@@ -49,6 +49,23 @@ o.spec('PSC', () => {
             .then(done);
     });
 
+    o('should pass the masterkey', done => {
+        var masterConfig = { url: config.url, applicationId: config.applicationId, masterKey: 'masterKey' };
+        var psc = new PSC(masterConfig, stubbedFetch);
+
+        psc.Master.run('foo', {})
+            .then(output => {
+                o(requests.length).equals(1);
+                var [url, options] = requests.pop();
+                o(url).equals('/url/functions/foo');
+
+                var requestBody = JSON.parse(options.body);
+                o(requestBody._MasterKey).equals(masterConfig.masterKey);
+                o(requestBody._SessionToken).equals(undefined);
+                done();
+            });
+    })
+
     o('should run a function', done => {
         var psc = new PSC(config, stubbedFetch);
         var args = {
