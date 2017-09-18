@@ -6,6 +6,7 @@
   "typings": "build/src/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "build-watch": "tsc --watch --pretty",
     "test": "ospec ./build/tests/*.spec.js",
     "prepublish": "tsc"
   },

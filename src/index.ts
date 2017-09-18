@@ -9,8 +9,10 @@ export interface PSCConfig {
 export type SimpleFetch = (url: string, data: any) => Promise<any>;
 
 export class PSCBoundClient {
-    private sessionToken: SessionToken;
-    private psc: PSC;
+
+    sessionToken: SessionToken;
+    psc: PSC;
+
     constructor(psc, sessionToken: SessionToken) {
         this.psc = psc;
         this.sessionToken = sessionToken;
@@ -38,14 +40,16 @@ interface ParseRequestBody {
     _ApplicationId: string;
     _method: string;
 }
+
+const HEADER_CONTENT_JSON = 'application/json';
 const HEADERS = {
-    'Content-Type': 'application/json'
+    'Content-Type': HEADER_CONTENT_JSON
 };
+
 export class PSC {
     static USE_MASTER_KEY = 'USE_MASTER_KEY';
-    static version = '0.1.0';
 
-    Master: PSCBoundClient;
+    _Master: PSCBoundClient;
     fetch: SimpleFetch;
     config: PSCConfig;
 
@@ -56,8 +60,14 @@ export class PSC {
 
         this.config = config;
         this.fetch = fetch;
+    }
 
-        this.Master = new PSCBoundClient(this, PSC.USE_MASTER_KEY);
+    get Master(): PSCBoundClient {
+        if (this._Master == null) {
+            this._Master = new PSCBoundClient(this, PSC.USE_MASTER_KEY);
+
+        }
+        return this._Master
     }
 
     login(username: string, password: string): Promise<PSCBoundClient> {
@@ -77,7 +87,7 @@ export class PSC {
         return this.request('GET', url, query.toJSON(), sessionToken).then(res => res.results)
     }
 
-    run<T>(functionName: string, args: any, sessionToken: SessionToken) {
+    run<T>(functionName: string, args: any, sessionToken: SessionToken): Promise<T> {
         const url = `${this.config.url}/functions/${functionName}`;
 
         return this.request('POST', url, args, sessionToken);
@@ -94,9 +104,7 @@ export class PSC {
         return this.request(method, url, data, sessionToken);
     }
 
-    private request(method: string, url: string, data, sessionToken: SessionToken): Promise<any> {
-
-
+    request(method: string, url: string, data: Object, sessionToken: SessionToken): Promise<any> {
         var requestBody: ParseRequestBody = {
             _ApplicationId: this.config.applicationId,
             _method: method
@@ -118,21 +126,28 @@ export class PSC {
             method: 'POST',
             headers: HEADERS,
             body: JSON.stringify(requestBody)
-        }).then(resp => {
-            if (resp.status > 299 || resp.status < 200) {
-                return Promise.reject(resp);
+        }).then(res => {
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.indexOf(HEADER_CONTENT_JSON) === -1) {
+                return Promise.reject(res);
             }
-            return resp.json();
+
+            const json = res.json();
+            if (res.ok) { // Status >= 200 & < 300
+                return json;
+            }
+
+            return json.then(j => Promise.reject(j));
         });
     }
 }
 
 export class PSCQuery<T> {
     public className: string;
-    private sessionToken: SessionToken;
-    private queryLimit: number = 1000;
-    private where = {};
-    private psc: PSC;
+    sessionToken: SessionToken;
+    queryLimit: number = 1000;
+    where = {};
+    psc: PSC;
 
     constructor(psc: PSC, sessionToken: SessionToken, className: string) {
         this.className = className;

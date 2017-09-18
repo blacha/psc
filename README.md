@@ -1,7 +1,6 @@
 # Parse Server Client
 
-
-REST client for [parse-server](https://github.com/parse/parse-server)
+Realy simple and lightweight REST client for [parse-server](https://github.com/parse/parse-server)
 
 ### Usage
 
@@ -20,16 +19,14 @@ const config = {
 
 const psc = new PSC(config, fetch);
 
-psc.login('username', 'password')
-    .then(boundClient => {
-        var query = boundClient.query<SomeObject>('ClassName');
-        query.equal('name', 'Hello')
-        return query.first()
-    })
-    .then(object => console.log(object.fooBar));
+const boundClient = await psc.login('username', 'password')
+const query = boundClient.query<SomeObject>('ClassName');
+query.equal('name', 'Hello')
+const object = await query.first()
+console.log(object.fooBar);
 
 
 // Run a function with the master key
-psc.Master.run('someFunction', { objectId: 'abc123' })
-    .then(output => console.log(output))
+const result = await psc.Master.run('someFunction', { objectId: 'abc123' });
+console.log(output);
 ```

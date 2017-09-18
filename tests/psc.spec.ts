@@ -7,12 +7,20 @@ export interface Foo {
 }
 
 o.spec('PSC', () => {
-    var outputJSON = {};
-    var output = null;
     var requests = [];
+    var response = {
+        ok: true,
+        headerJson: {},
+        headers: {
+            get: key => response.headerJson[key.toLowerCase()]
+        },
+        output: {},
+        json: _ => Promise.resolve(response.output)
+    };
+
     var stubbedFetch = (a, b) => {
         requests.push([a, b]);
-        return output;
+        return Promise.resolve(response);
     };
 
     var config = {
@@ -21,14 +29,18 @@ o.spec('PSC', () => {
     }
 
     o.beforeEach(() => {
-        output = Promise.resolve({ status: 200, json: () => outputJSON });
+        response.output = { sessionToken: 'sessionToken' };
+        response.ok = true;
+        response.json = _ => Promise.resolve(response.output);
+        response.headerJson = { 'content-type': 'application/json' }
         requests = [];
     });
 
     o('should login', done => {
-        outputJSON = {
+        response.output = {
             sessionToken: 'sessionToken'
         }
+
         var psc = new PSC(config, stubbedFetch);
         psc.login('username', 'password')
             .then(data => {
@@ -48,6 +60,21 @@ o.spec('PSC', () => {
             })
             .then(done);
     });
+
+    o('should reject with json objects', done => {
+        const message = 'FakeMessage';
+        response.ok = false;
+        response.output = { message };
+
+        var psc = new PSC(config, stubbedFetch);
+        psc.run('TestFunction', {}, 'FakeSession')
+            .catch(e => {
+                o(typeof e).equals('object');
+                o(e instanceof Error).equals(false);
+                o(e.message).equals(message);
+                done();
+            })
+    })
 
     o('should pass the masterkey', done => {
         var masterConfig = { url: config.url, applicationId: config.applicationId, masterKey: 'masterKey' };
