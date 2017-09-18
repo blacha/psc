@@ -6,7 +6,7 @@ Realy simple and lightweight REST client for [parse-server](https://github.com/p
 
 ```typescript
 import PSC from 'psc';
-import fetch from 'fetch-polyfill';
+import fetch from 'node-fetch';
 
 interface SomeObject {
     fooBar: string;
@@ -20,8 +20,10 @@ const config = {
 const psc = new PSC(config, fetch);
 
 const boundClient = await psc.login('username', 'password')
+
 const query = boundClient.query<SomeObject>('ClassName');
 query.equal('name', 'Hello')
+
 const object = await query.first()
 console.log(object.fooBar);
 
