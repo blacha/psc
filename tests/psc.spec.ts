@@ -56,7 +56,7 @@ o.spec('PSC', () => {
                 o(requestBody.username).equals('username');
                 o(requestBody.password).equals('password');
 
-                o((<any>data).sessionToken).equals('sessionToken');
+                o(data.sessionToken).equals('sessionToken');
             })
             .then(done);
     });
